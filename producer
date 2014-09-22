@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+Bundler.require
+
+servers = [
+  "localhost:9092"
+]
+producer_name = "example_producer"
+topic_name = "example_topic"
+
+producer = Poseidon::Producer.new(servers, producer_name)
+
+class Encoder
+  SCHEMA_JSON = File.read(File.expand_path("../Example.avsc", __FILE__))
+  SCHEMA = Avro::Schema.parse(SCHEMA_JSON)
+
+  def encode(params)
+    writer = Avro::IO::DatumWriter.new(SCHEMA)
+    output = StringIO.new('', 'w')
+    output.set_encoding('BINARY')
+
+    # Avro writes to the output stream
+    dw = Avro::DataFile::Writer.new(output, writer, SCHEMA)
+    dw << params
+    dw.close
+
+    # return the string representation of the Avro data file
+    output.string
+  end
+end
+
+encoder = Encoder.new
+
+messages = []
+data = {
+  "test_number" => 5,
+  "foo"         => "bar"
+}
+messages << Poseidon::MessageToSend.new(topic_name, encoder.encode(data))
+messages << Poseidon::MessageToSend.new(topic_name, encoder.encode(data))
+producer.send_messages(messages)

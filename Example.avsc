@@ -1,0 +1,12 @@
+{
+  "type" : "record",
+  "name" : "TestRecord",
+  "namespace" : "Example",
+  "fields" : [ {
+    "name" : "test_number",
+    "type" : "int"
+  }, {
+    "name" : "foo",
+    "type" : "string"
+  } ]
+}

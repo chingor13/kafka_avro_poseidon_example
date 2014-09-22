@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+Bundler.require
+require 'pp'
+require 'logger'
+
+logger = Logger.new(STDOUT)
+
+group_name = "example-group"
+kafka_servers = [
+  "localhost:9092"
+]
+zookeeper_servers = [
+  "localhost:2181"
+]
+topic_name = "example_topic"
+
+consumer = Poseidon::ConsumerGroup.new(
+  group_name,
+  kafka_servers,
+  zookeeper_servers,
+  topic_name
+)
+
+# debug info
+logger.debug "partitions: #{consumer.partitions}"
+logger.debug "claimed: #{consumer.claimed}"
+
+def handle_message(m)
+  
+end
+
+loop do
+  consumer.fetch do |partition, bulk|
+    bulk.each do |m|
+      logger.info "got message for topic: #{m.topic} offset: #{m.offset}"
+      data = StringIO.new(m.value)
+      dr = Avro::DataFile::Reader.new(data, Avro::IO::DatumReader.new)
+      dr.each do |record|
+        logger.info "got record: #{record.inspect}"
+      end
+    end
+  end
+end
