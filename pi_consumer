@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+Bundler.require
+require 'pp'
+require 'json'
+$:.unshift("./lib")
+require 'avro_consumer'
+
+logger = Logger.new(STDOUT)
+
+host = ENV.fetch('HOST', 'localhost')
+kafka_servers = [
+  "#{host}:9092"
+]
+zookeeper_servers = [
+  "#{host}:2181"
+]
+
+class ProfessionalImpressionConsumer < AvroConsumer
+  self.group_name = "professionalimpressions"
+  self.topic_name = "clickstream"
+
+  def consume(reader)
+    reader.each do |record|
+      next unless record["type"] == "professional_impression"
+      # log "got record: #{record.inspect}"
+      data = JSON.parse(record["data_json"])
+      log "professional_impression: #{data["professional_id"]}"
+    end
+  end
+end
+
+consumer = ProfessionalImpressionConsumer.new(kafka_servers, zookeeper_servers, logger: logger)
+consumer.run
