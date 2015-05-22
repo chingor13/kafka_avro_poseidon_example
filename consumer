@@ -9,11 +9,13 @@ require 'avro_consumer'
 logger = Logger.new(STDOUT)
 
 group_name = "example-group"
+
+host = ENV.fetch('HOST', 'localhost')
 kafka_servers = [
-  "localhost:9092"
+  "#{host}:9092"
 ]
 zookeeper_servers = [
-  "localhost:2181"
+  "#{host}:2181"
 ]
 topic_name = "example_topic"
 

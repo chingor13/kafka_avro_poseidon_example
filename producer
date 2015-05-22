@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
+require 'pp'
 
 Bundler.require
 
+host = ENV.fetch('HOST', 'localhost')
 servers = [
-  "localhost:9092"
+  "#{host}:9092"
 ]
 producer_name = "example_producer"
 topic_name = "example_topic"
