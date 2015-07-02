@@ -11,11 +11,12 @@ logger = Logger.new(STDOUT)
 group_name = "example-group"
 
 host = ENV.fetch('HOST', 'localhost')
+zk_host = ENV.fetch('ZK_HOST', host)
 kafka_servers = [
   "#{host}:9092"
 ]
 zookeeper_servers = [
-  "#{host}:2181"
+  "#{zk_host}:2181"
 ]
 topic_name = "example_topic"
 

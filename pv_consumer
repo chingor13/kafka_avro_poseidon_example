@@ -8,12 +8,13 @@ require 'avro_consumer'
 
 logger = Logger.new(STDOUT)
 
-host = ENV.fetch('HOST', 'localhost')
+host = ENV.fetch('KAFKA_HOST', 'localhost')
 kafka_servers = [
   "#{host}:9092"
 ]
+zk_host = ENV.fetch('ZK_HOST', host)
 zookeeper_servers = [
-  "#{host}:2181"
+  "#{zk_host}:2181"
 ]
 
 class PageviewConsumer < AvroConsumer
@@ -25,7 +26,7 @@ class PageviewConsumer < AvroConsumer
       next unless record["type"] == "page_view"
       # log "got record: #{record.inspect}"
       data = JSON.parse(record["data_json"])
-      log "pageview: #{data["url"]}"
+      log "pageview: #{data["url"]} - #{data}"
     end
   end
 end
